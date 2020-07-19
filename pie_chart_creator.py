@@ -1,4 +1,5 @@
 
+# This program can be used, but some features aren't completely ready yet. I'll update this soon to fix all bugs.
 import matplotlib.pyplot as plt
 import tkinter as tk
 
