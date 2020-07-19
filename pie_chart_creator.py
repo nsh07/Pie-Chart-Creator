@@ -1,5 +1,4 @@
 
-# This program can be used, but some features aren't completely ready yet. I'll update this soon to fix all bugs.
 import matplotlib.pyplot as plt
 import tkinter as tk
 
@@ -22,6 +21,9 @@ class Check:  # Simple class to check if a value is float, yes etc.
 
 
 window = tk.Tk()
+for _ in range(8):
+	window.columnconfigure(_, weight=1)
+	window.rowconfigure(_, weight=1)
 
 pcc_logo = tk.PhotoImage(file="PCC_Logo.png")
 pcc_logo_lbl = tk.Label(window, image=pcc_logo)
@@ -30,6 +32,20 @@ pcc_logo_lbl.grid(column=1, columnspan=3)
 pie_items = []
 pie_items_percentage = []
 explode = []
+
+
+def instructions():
+	instructions_file = open("instructions.txt")
+	instructions = tk.Tk()
+	def exit_instructions():
+		instructions.destroy()
+	instruction_lbl = tk.Label(
+                master=instructions,
+                text=instructions_file.read()
+                )
+	instruction_lbl.grid(row=1, column=1, sticky="W")
+	back_to_pcc_btn = tk.Button(master=instructions, text="Back to Pie Chart Creator", command=exit_instructions)
+	back_to_pcc_btn.grid(row=2, column=1, pady=5)
 
 
 def append():
@@ -55,10 +71,11 @@ def append():
 		not_appended = tk.Tk()
 		not_appended_label = tk.Label(
 			master=not_appended,
-			text=f"Values not added to register\nbecause {percentage_entry.get()} is not a\nvalid decimal number.\nPress any key to exit this\nwarning menu."
+			text=f"Values not added to register\nbecause \"{percentage_entry.get()}\" is not a\nvalid decimal number.\nPress any key to exit this\nwarning menu."
 		)
-		not_appended_label.bind('<KeyPress>', exit_not_appended)
 		not_appended_label.pack()
+		back_btn = tk.Button(master=not_appended, text="Back to Pie Chart Creator", command=exit_not_appended)
+		back_btn.pack(fill=tk.X)
 
 
 def show_register():
@@ -179,19 +196,19 @@ item_entry_lbl = tk.Label(text="Name of item:")
 item_entry = tk.Entry()
 
 item_entry_lbl.grid(row=1, column=1, sticky="W")
-item_entry.grid(row=1, column=2, columnspan=2, sticky="WE")
+item_entry.grid(row=1, column=2, sticky="WE")
 
 percentage_entry_lbl = tk.Label(text="Percentage:")
 percentage_entry = tk.Entry()
 
 percentage_entry_lbl.grid(row=2, column=1, sticky="W")
-percentage_entry.grid(row=2, column=2, columnspan=2, sticky="WE")
+percentage_entry.grid(row=2, column=2, sticky="WE")
 
 explode_entry_lbl = tk.Label(text="Enable emphasis(Y/N):")
 explode_entry = tk.Entry()
 
 explode_entry_lbl.grid(row=3, column=1, sticky="W")
-explode_entry.grid(row=3, column=2, columnspan=2, sticky="WE")
+explode_entry.grid(row=3, column=2, sticky="WE")
 
 append_btn = tk.Button(
 	text="Add values to register",
@@ -213,11 +230,16 @@ show_register_btn = tk.Button(
 	text="View register",
 	command=show_register
 )
+instructions_btn = tk.Button(
+        text="Read Instructions",
+        command=instructions
+)
 
 append_btn.grid(row=4, column=1, sticky="WE", padx=1, pady=1)
-show_register_btn.grid(row=4, column=2, columnspan=2, sticky="WE", padx=1, pady=1)
+show_register_btn.grid(row=4, column=2, sticky="WE", padx=1, pady=1)
 clear_btn.grid(row=5, column=1, sticky="WE", padx=1, pady=1)
-exit_btn.grid(row=5, column=2, columnspan=2, sticky="WE", padx=1, pady=1)
-make_chart_btn.grid(row=6, column=1, columnspan=3, sticky="WE", padx=1, pady=1)
+exit_btn.grid(row=5, column=2, sticky="WE", padx=1, pady=1)
+make_chart_btn.grid(row=7, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
+instructions_btn.grid(row=6, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
 
 window.mainloop()
