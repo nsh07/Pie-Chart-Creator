@@ -37,6 +37,7 @@ explode = []
 def instructions():
 	instructions_file = open("instructions.txt")
 	instructions = tk.Tk()
+	instructions.title("PCC Instructions")
 	def exit_instructions():
 		instructions.destroy()
 	instruction_lbl = tk.Label(
@@ -69,6 +70,7 @@ def append():
 
 	else:
 		not_appended = tk.Tk()
+		not_appended.title("Warning")
 		not_appended_label = tk.Label(
 			master=not_appended,
 			text=f"Values not added to register\nbecause \"{percentage_entry.get()}\" is not a\nvalid decimal number.\nPress any key to exit this\nwarning menu."
@@ -83,6 +85,7 @@ def show_register():
 	copy_pie_items_percentage = pie_items_percentage
 	copy_explode = explode
 	register_window = tk.Tk()
+	register_window.title("PCC Register")
 
 	def exit_register():
 		register_window.destroy()
@@ -146,6 +149,7 @@ def _exit_():
 		exit_window.destroy()
 
 	exit_window = tk.Tk()
+	exit_window.title("Exit?")
 	exit_warning_lbl = tk.Label(master=exit_window, text="Do you really want to exit?\nAll registered values will be lost")
 	exit_yes_btn = tk.Button(master=exit_window, text="Yes", command=finalise_exit)
 	exit_no_btn = tk.Button(master=exit_window, text="No", command=cancel_exit)
@@ -156,6 +160,7 @@ def _exit_():
 
 def clear():
 	clear_warning = tk.Tk()
+	clear_warning.title("Clear Register?")
 
 	def finalise_clear():
 		len_pie_items = len(pie_items)
@@ -241,5 +246,7 @@ clear_btn.grid(row=5, column=1, sticky="WE", padx=1, pady=1)
 exit_btn.grid(row=5, column=2, sticky="WE", padx=1, pady=1)
 make_chart_btn.grid(row=7, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
 instructions_btn.grid(row=6, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
+
+window.title("Pie Chart Creator")
 
 window.mainloop()
