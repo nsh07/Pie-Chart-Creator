@@ -4,4 +4,4 @@ A Python program which creates a pie chart using MatPlotLib and has a GUI create
 
 **Important Note**
 
-This program will not work unless PCC logo.png, instructions.txt and pie_chart_creator.py are in the same folder on your device.
+This program will not work unless `PCC logo.png`, `instructions.txt` and `pie_chart_creator.py` are in the same folder on your device.
