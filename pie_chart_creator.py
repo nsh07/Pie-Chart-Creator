@@ -26,8 +26,7 @@ for _ in range(8):
 	window.rowconfigure(_, weight=1)
 
 pcc_logo = tk.PhotoImage(file="PCC_Logo.png")
-pcc_logo_lbl = tk.Label(window, image=pcc_logo)
-pcc_logo_lbl.grid(column=1, columnspan=3)
+pcc_logo_lbl = tk.Label(window, image=pcc_logo).grid(column=1, columnspan=3)
 
 pie_items = []
 pie_items_percentage = []
@@ -41,12 +40,11 @@ def instructions():
 	def exit_instructions():
 		instructions.destroy()
 	instruction_lbl = tk.Label(
-                master=instructions,
-                text=instructions_file.read()
-                )
-	instruction_lbl.grid(row=1, column=1, sticky="W")
-	back_to_pcc_btn = tk.Button(master=instructions, text="Back to Pie Chart Creator", command=exit_instructions)
-	back_to_pcc_btn.grid(row=2, column=1, pady=5)
+		master=instructions,
+		text=instructions_file.read(),
+		justify=tk.LEFT
+		).grid(row=1, column=1, sticky="W")
+	back_to_pcc_btn = tk.Button(master=instructions, text="Back to Pie Chart Creator", command=exit_instructions).grid(row=2, column=1, pady=5)
 
 
 def append():
