@@ -1,250 +1,205 @@
-
 import matplotlib.pyplot as plt
-import tkinter as tk
+
+try:
+    import tkinter as tk
+    from tkinter import messagebox
+
+except (ModuleNotFoundError, ImportError):
+    import Tkinter as tk
+    import tkMessageBox as messagebox
 
 
-class Check:  # Simple class to check if a value is float, yes etc.
-	def __init__(self, string):
-		self.string = string
+def center_window(window, title):
+    '''This function places any window (either TopLevel or Tk) to the center of the screen'''
 
-	def isyes(self):
-		if self.string.title() == "Y" or self.string.title() == "Yes":
-			return True
-		else:
-			return False
+    window.withdraw()
 
-	def isfloat(self):
-		if self.string.replace(".", "", 1).isdigit():
-			return True
-		else:
-			return False
+    window.update()
+    window.focus()
+    window.grab_set()
+    window.title(title)
+    window.resizable(0, 0)
+    window.iconbitmap('icon.ico')
 
+    width, height = window.winfo_width(), window.winfo_height()
+    window.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
 
-window = tk.Tk()
-for _ in range(8):
-	window.columnconfigure(_, weight=1)
-	window.rowconfigure(_, weight=1)
-
-pcc_logo = tk.PhotoImage(file="PCC_Logo.png")
-pcc_logo_lbl = tk.Label(window, image=pcc_logo).grid(column=1, columnspan=3)
-
-pie_items = []
-pie_items_percentage = []
-explode = []
+    window.deiconify()
 
 
 def instructions():
-	instructions_file = open("instructions.txt")
-	instructions = tk.Tk()
-	instructions.title("PCC Instructions")
-	def exit_instructions():
-		instructions.destroy()
-	instruction_lbl = tk.Label(
-		master=instructions,
-		text=instructions_file.read(),
-		justify=tk.LEFT
-		).grid(row=1, column=1, sticky="W")
-	back_to_pcc_btn = tk.Button(master=instructions, text="Back to Pie Chart Creator", command=exit_instructions).grid(row=2, column=1, pady=5)
+    with open('instructions.txt', 'r') as f:
+        contents = f.read().strip('\n')
+
+    instructions_window = tk.Toplevel(window)
+
+    instruction_lbl = tk.Label(master=instructions_window, text=contents, justify=tk.LEFT)
+    instruction_lbl.grid(row=1, column=1)
+
+    instructions_window.after(0, lambda: center_window(instructions_window, 'PCC Instructions'))
+    instructions_window.mainloop()
 
 
 def append():
-	def exit_not_appended():
-		not_appended.destroy()
+    item = item_entry.get().title()
+    explode_ = explode_entry.get().title()
+    percentage = percentage_entry.get()
 
-	if Check.isfloat(Check(percentage_entry.get())):
-		item = str(item_entry.get())
-		pie_items.append(item.title())
-		percentage = float(percentage_entry.get())
-		pie_items_percentage.append(float(percentage).__round__(2))
-		explode_ = explode_entry.get()
-		if Check.isyes(Check(explode_)):
-			explode.append(0.1)
-		else:
-			explode.append(0)
+    if not item:
+        messagebox.showerror('Invalid Input', 'Invalid name of item')
 
-		item_entry.delete(0, tk.END)
-		percentage_entry.delete(0, tk.END)
-		explode_entry.delete(0, tk.END)
+    elif percentage.isdigit():
+        percentage = round(float(percentage), 2)
 
-	else:
-		not_appended = tk.Tk()
-		not_appended.title("Warning")
-		not_appended_label = tk.Label(
-			master=not_appended,
-			text=f"Values not added to register\nbecause \"{percentage_entry.get()}\" is not a\nvalid decimal number.\nPress any key to exit this\nwarning menu."
-		)
-		not_appended_label.pack()
-		back_btn = tk.Button(master=not_appended, text="Back to Pie Chart Creator", command=exit_not_appended)
-		back_btn.pack(fill=tk.X)
+        pie_items.append(item)
+        pie_items_percentage.append(percentage)
+
+        if explode_ in ['Y', 'Yes']:
+            explode.append(0.1)
+
+        else:
+            explode.append(0)
+
+        for widget in [item_entry, percentage_entry, explode_entry]:
+            widget.delete(0, tk.END)
+
+    else:
+        messagebox.showerror('Invalid Percentage', 'Percentage must be in number')
 
 
 def show_register():
-	copy_pie_items = pie_items
-	copy_pie_items_percentage = pie_items_percentage
-	copy_explode = explode
-	register_window = tk.Tk()
-	register_window.title("PCC Register")
+    copy_pie_items = pie_items
+    copy_pie_items_percentage = pie_items_percentage
+    copy_explode = explode
 
-	def exit_register():
-		register_window.destroy()
+    a = 0
 
-	a, b = 0, 0
-	if len(pie_items) != 0:
-		added_lbl_1 = tk.Label(master=register_window, text="Name of item")
-		added_lbl_2 = tk.Label(master=register_window, text="Percentage")
-		added_lbl_3 = tk.Label(master=register_window, text="Emphasis")
-		added_lbl_1.grid(row=0, column=1, sticky="W", pady=10)
-		added_lbl_2.grid(row=0, column=2, padx=50, pady=10)
-		added_lbl_3.grid(row=0, column=3, sticky="E", pady=10)
+    register_window = tk.Toplevel()
 
-		for pie_item in copy_pie_items:
-			appended_lbl1 = tk.Label(master=register_window, text=f"{pie_item.title()}")
-			appended_lbl1.grid(row=a + 1, column=1, sticky="W")
-			appended_lbl2 = tk.Label(master=register_window, text=f"{copy_pie_items_percentage[a]}")
-			appended_lbl2.grid(row=a + 1, column=2)
-			if copy_explode[b] == 0.1:
-				_explode_ = "Enabled"
-			else:
-				_explode_ = "Disabled"
-			appended_lbl3 = tk.Label(master=register_window, text=f"{_explode_}")
-			appended_lbl3.grid(row=a + 1, column=3, sticky="E")
+    if pie_items:
+        added_lbl_1 = tk.Label(register_window, text="Name of item", justify=tk.LEFT)
+        added_lbl_1.grid(row=0, column=0, pady=5)
 
-			a += 1
-			b += 1
+        added_lbl_2 = tk.Label(register_window, text="Percentage", justify=tk.LEFT)
+        added_lbl_2.grid(row=0, column=1, pady=5)
 
-	else:
-		added_lbl_1 = tk.Label(master=register_window, text="No items added yet. Maybe add some items?")
-		added_lbl_1.grid(row=0, column=1, pady=10)
+        added_lbl_3 = tk.Label(register_window, text="Emphasis", justify=tk.LEFT)
+        added_lbl_3.grid(row=0, column=2, pady=5)
 
-	exit_register_btn = tk.Button(
-		master=register_window,
-		text="Back to Pie Chart Creator",
-		command=exit_register,
-		)
-	clear_register_btn = tk.Button(
-			master=register_window,
-			text="Clear Register",
-			command=clear
-			)
-	exit_register_btn.grid(row=a + 1, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
-	clear_register_btn.grid(row=a + 1, column=3, sticky="WE", padx=1, pady=1)
+        for pie_item in copy_pie_items:
+            appended_lbl1 = tk.Label(register_window, text=f"{pie_item.title()}")
+            appended_lbl1.grid(row=a + 1, column=0)
+
+            appended_lbl2 = tk.Label(register_window, text=f"{copy_pie_items_percentage[a]}")
+            appended_lbl2.grid(row=a + 1, column=1)
+
+            if copy_explode[a] == 0.1:
+                _explode_ = "Enabled"
+
+            else:
+                _explode_ = "Disabled"
+
+            appended_lbl3 = tk.Label(register_window, text=f"{_explode_}")
+            appended_lbl3.grid(row=a + 1, column=2)
+
+            a += 1
+
+        appended_lbl2.grid(pady=10)
+
+    else:
+        added_lbl_1 = tk.Label(register_window, text="No items added yet. Maybe add some items?")
+        added_lbl_1.grid(row=0, column=1, pady=10)
+
+    clear_register_btn = tk.Button(register_window, text="Clear Register", justify='center', bd=1, cursor='hand2', relief=tk.SOLID, command=lambda: clear(register_window))
+    clear_register_btn.grid(row=a + 1, column=1, pady=10)
+
+    register_window.after(0, lambda: center_window(register_window, 'PCC Register'))
+    register_window.mainloop()
 
 
 def make_chart():
-	figure, pie_chart = plt.subplots()
-	pie_chart.pie(pie_items_percentage, explode=explode, labels=pie_items, autopct='%1.2f%%', shadow=True,
-															startangle=90)
-	pie_chart.axis('equal')
-	plt.show()
+    figure, pie_chart = plt.subplots()
+    pie_chart.pie(pie_items_percentage, explode=explode, labels=pie_items, autopct='%1.2f%%', shadow=True, startangle=90)
+    pie_chart.axis('equal')
+    plt.show()
 
 
 def _exit_():
-	def finalise_exit():
-		exit_window.destroy()
-		window.destroy()
-
-	def cancel_exit():
-		exit_window.destroy()
-
-	exit_window = tk.Tk()
-	exit_window.title("Exit?")
-	exit_warning_lbl = tk.Label(master=exit_window, text="Do you really want to exit?\nAll registered values will be lost")
-	exit_yes_btn = tk.Button(master=exit_window, text="Yes", command=finalise_exit)
-	exit_no_btn = tk.Button(master=exit_window, text="No", command=cancel_exit)
-	exit_warning_lbl.grid(row=1, column=1, columnspan=2, rowspan=2)
-	exit_yes_btn.grid(row=3, column=1, sticky="WE", padx=1, pady=1)
-	exit_no_btn.grid(row=3, column=2, sticky="WE", padx=1, pady=1)
+    if messagebox.askyesno('Exit?', 'Do you really want to exit?\nAll registered values will be lost'):
+        window.destroy()
 
 
-def clear():
-	clear_warning = tk.Tk()
-	clear_warning.title("Clear Register?")
+def clear(window=None):
+    if pie_items:
+        if messagebox.askyesno('Clear Register?', 'Do you really want to clear REGISTER?'):
+            for lists in [pie_items, pie_items_percentage, explode]:
+                del lists[0]
 
-	def finalise_clear():
-		len_pie_items = len(pie_items)
-		for _ in range(len_pie_items):
-			del pie_items[0]
-			del pie_items_percentage[0]
-			del explode[0]
-		clear_warning.destroy()
+    else:
+        messagebox.showinfo('Clear Register?', "No items added yet. Maybe add some items?")
 
-	def back_to_pcc():
-		clear_warning.destroy()
-
-	if len(pie_items) != 0:
-		clear_warning_lbl = tk.Label(
-					master=clear_warning,
-					text="If you press the clear register button, all the\nvalues in the item register will be cleared.\nIt is advised to have a look at the register before clearing it.\nThis cannot be undone.",
-					)
-		clear_warning_lbl.grid(row=1, column=1, columnspan=2, pady=10)
-		finalise_clear_btn = tk.Button(master=clear_warning, text="Clear Register", command=finalise_clear)
-		finalise_clear_btn.grid(row=2, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
-		back_to_pcc_button = tk.Button(master=clear_warning, text="Back to Pie Chart Creator", command=back_to_pcc)
-		back_to_pcc_button.grid(row=3, column=1, sticky="WE", padx=1, pady=1)
-		view_register = tk.Button(master=clear_warning, text="View Register", command=show_register)
-		view_register.grid(row=3, column=2, sticky="WE", padx=1, pady=1)
-
-	else:
-		added_lbl_1 = tk.Label(master=clear_warning, text="No items added yet. Maybe add some items?")
-		added_lbl_1.grid(row=0, column=1, pady=10)
-		exit_clear_warning = tk.Button(
-			master=clear_warning,
-			text="Back to Pie Chart Creator",
-			command=back_to_pcc,
-			)
-		exit_clear_warning.grid(row=1, column=1, sticky="WE", padx=1, pady=1)
+    if window:
+        window.destroy()
 
 
-item_entry_lbl = tk.Label(text="Name of item:")
-item_entry = tk.Entry()
+def left_button_bind(event, window):
+    '''Focus out from the entry widget when user clicks to any widget'''
 
+    if event.widget not in [item_entry, percentage_entry, explode_entry]:
+        window.focus()
+
+
+explode = []
+pie_items = []
+pie_items_percentage = []
+
+window = tk.Tk()
+screen_width, screen_height = window.winfo_screenwidth() // 2, window.winfo_screenheight() // 2
+
+for _ in range(8):
+    window.columnconfigure(_, weight=1)
+    window.rowconfigure(_, weight=1)
+
+pcc_logo = tk.PhotoImage(file="PCC_Logo.png")
+pcc_logo_lbl = tk.Label(window, image=pcc_logo)
+pcc_logo_lbl.grid(column=1, columnspan=3)
+
+item_entry_lbl = tk.Label(window, text="Name of item:")
 item_entry_lbl.grid(row=1, column=1, sticky="W")
+
+item_entry = tk.Entry(window)
 item_entry.grid(row=1, column=2, sticky="WE")
 
-percentage_entry_lbl = tk.Label(text="Percentage:")
-percentage_entry = tk.Entry()
-
+percentage_entry_lbl = tk.Label(window, text="Percentage:")
 percentage_entry_lbl.grid(row=2, column=1, sticky="W")
+
+percentage_entry = tk.Entry(window)
 percentage_entry.grid(row=2, column=2, sticky="WE")
 
-explode_entry_lbl = tk.Label(text="Enable emphasis(Y/N):")
-explode_entry = tk.Entry()
-
+explode_entry_lbl = tk.Label(window, text="Enable emphasis(Y/N):")
 explode_entry_lbl.grid(row=3, column=1, sticky="W")
+
+explode_entry = tk.Entry(window)
 explode_entry.grid(row=3, column=2, sticky="WE")
 
-append_btn = tk.Button(
-	text="Add values to register",
-	command=append
-)
-make_chart_btn = tk.Button(
-	text="Make chart with registered values",
-	command=make_chart
-)
-clear_btn = tk.Button(
-	text="Clear Register",
-	command=clear
-)
-exit_btn = tk.Button(
-	text="Exit Pie Chart Creator",
-	command=_exit_
-)
-show_register_btn = tk.Button(
-	text="View register",
-	command=show_register
-)
-instructions_btn = tk.Button(
-        text="Read Instructions",
-        command=instructions
-)
-
+append_btn = tk.Button(window, text="Add values to register", command=append)
 append_btn.grid(row=4, column=1, sticky="WE", padx=1, pady=1)
-show_register_btn.grid(row=4, column=2, sticky="WE", padx=1, pady=1)
-clear_btn.grid(row=5, column=1, sticky="WE", padx=1, pady=1)
-exit_btn.grid(row=5, column=2, sticky="WE", padx=1, pady=1)
+
+make_chart_btn = tk.Button(window, text="Make chart with registered values", command=make_chart)
 make_chart_btn.grid(row=7, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
+
+clear_btn = tk.Button(window, text="Clear Register", command=clear)
+clear_btn.grid(row=5, column=1, sticky="WE", padx=1, pady=1)
+
+exit_btn = tk.Button(window, text="Exit Pie Chart Creator", command=_exit_)
+exit_btn.grid(row=5, column=2, sticky="WE", padx=1, pady=1)
+
+show_register_btn = tk.Button(window, text="View register", command=show_register)
+show_register_btn.grid(row=4, column=2, sticky="WE", padx=1, pady=1)
+
+instructions_btn = tk.Button(window, text="Read Instructions", command=instructions)
 instructions_btn.grid(row=6, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
 
-window.title("Pie Chart Creator")
-
+window.bind('<Button-1>', lambda event, window=window: left_button_bind(event, window))
+window.after(0, lambda: center_window(window, 'Pie Chart Creator'))
 window.mainloop()
