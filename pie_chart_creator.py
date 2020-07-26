@@ -54,7 +54,7 @@ def append():
         pie_items.append(item)
         pie_items_percentage.append(percentage)
 
-        if explode_ in ['Y', 'Yes']:
+        if explode_.title() in ['Y', 'Yes']:
             explode.append(0.1)
 
         else:
@@ -64,7 +64,7 @@ def append():
             widget.delete(0, tk.END)
 
     else:
-        messagebox.showerror('Invalid Percentage', 'Percentage must be in number')
+        messagebox.showerror('Invalid Percentage', 'Percentage must be a number')
 
 
 def show_register():
@@ -131,7 +131,7 @@ def _exit_():
 
 def clear(window=None):
     if pie_items:
-        if messagebox.askyesno('Clear Register?', 'Do you really want to clear REGISTER?'):
+        if messagebox.askyesno('Clear Register?', 'Do you really want to clear the register?\nThis cannot be undone.'):
             for lists in [pie_items, pie_items_percentage, explode]:
                 del lists[0]
 
