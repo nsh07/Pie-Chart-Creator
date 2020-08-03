@@ -1,12 +1,15 @@
-import matplotlib.pyplot as plt
+import os
+import sys
 
-try:
+try:  # Python 3
     import tkinter as tk
     from tkinter import messagebox
 
-except (ModuleNotFoundError, ImportError):
+except (ModuleNotFoundError, ImportError):  # Python 2
     import Tkinter as tk
     import tkMessageBox as messagebox
+
+import matplotlib.pyplot as plt
 
 
 def center_window(window, title):
@@ -19,28 +22,56 @@ def center_window(window, title):
     window.grab_set()
     window.title(title)
     window.resizable(0, 0)
-    window.iconbitmap('icon.ico')
+    window.iconbitmap(resource_path('included_files\\icon.ico'))
 
     width, height = window.winfo_width(), window.winfo_height()
     window.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
-
     window.deiconify()
 
 
+def change_style(wid):
+    '''Change text styles to bold or italic'''
+
+    italic_index = ('23.0', '23.83')
+    bold_indexs = [('1.0', '1.19'), ('4.0', '4.14'), ('5.4', '5.31'), ('8.4', '8.22'), ('11.4', '11.23'), ('14.4', '14.31'), ('17.4', '17.26'), ('20.4', '20.42')]
+
+    for start, end in bold_indexs:
+        wid.tag_add('b', start, end)
+
+    wid.tag_configure('b', font=('Helvetica', '11', 'bold'))
+
+    wid.tag_add('i', italic_index[0], italic_index[1])
+    wid.tag_configure('i', font=('Helvetica', '11', 'italic'))
+
+    wid.config(state=tk.DISABLED)
+
+
 def instructions():
-    with open('instructions.txt', 'r') as f:
+    '''Show instruction window'''
+
+    file_path = resource_path('included_files\\instructions.txt')
+
+    with open(file_path, 'r') as f:
         contents = f.read().strip('\n')
 
     instructions_window = tk.Toplevel(window)
 
-    instruction_lbl = tk.Label(master=instructions_window, text=contents, justify=tk.LEFT)
-    instruction_lbl.grid(row=1, column=1)
+    instructions_text_widget_frame = tk.Frame(instructions_window)
 
+    instructions_text_widget = tk.Text(instructions_text_widget_frame, height=26, cursor='arrow')
+    instructions_text_widget.insert('1.0', contents)
+    instructions_text_widget.pack(side=tk.LEFT)
+
+    instructions_text_widget_frame.pack()
+
+    instructions_window.after(0, lambda: change_style(instructions_text_widget))
     instructions_window.after(0, lambda: center_window(instructions_window, 'PCC Instructions'))
     instructions_window.mainloop()
 
 
 def append():
+    '''Store data given by the user'''
+
     item = item_entry.get().title()
     explode_ = explode_entry.get().title()
     percentage = percentage_entry.get()
@@ -54,7 +85,7 @@ def append():
         pie_items.append(item)
         pie_items_percentage.append(percentage)
 
-        if explode_.title() in ['Y', 'Yes']:
+        if explode_ in ['Y', 'Yes']:
             explode.append(0.1)
 
         else:
@@ -64,10 +95,12 @@ def append():
             widget.delete(0, tk.END)
 
     else:
-        messagebox.showerror('Invalid Percentage', 'Percentage must be a number')
+        messagebox.showerror('Invalid Percentage', 'Percentage must be in number')
 
 
 def show_register():
+    '''Show stored data'''
+
     copy_pie_items = pie_items
     copy_pie_items_percentage = pie_items_percentage
     copy_explode = explode
@@ -118,20 +151,30 @@ def show_register():
 
 
 def make_chart():
-    figure, pie_chart = plt.subplots()
-    pie_chart.pie(pie_items_percentage, explode=explode, labels=pie_items, autopct='%1.2f%%', shadow=True, startangle=90)
-    pie_chart.axis('equal')
-    plt.show()
+    '''Make pie-chart as per the user's data'''
+
+    if pie_items:
+        figure, pie_chart = plt.subplots()
+        pie_chart.pie(pie_items_percentage, explode=explode, labels=pie_items, autopct='%1.2f%%', shadow=True, startangle=90)
+        pie_chart.axis('equal')
+        plt.show()
+
+    else:
+        messagebox.showerror('No data', 'No data were inputed to make pie-charts')
 
 
 def _exit_():
+    '''Quit program'''
+
     if messagebox.askyesno('Exit?', 'Do you really want to exit?\nAll registered values will be lost'):
         window.destroy()
 
 
 def clear(window=None):
+    '''Clear data from the register'''
+
     if pie_items:
-        if messagebox.askyesno('Clear Register?', 'Do you really want to clear the register?\nThis cannot be undone.'):
+        if messagebox.askyesno('Clear Register?', 'Do you really want to clear REGISTER?'):
             for lists in [pie_items, pie_items_percentage, explode]:
                 del lists[0]
 
@@ -149,9 +192,25 @@ def left_button_bind(event, window):
         window.focus()
 
 
-explode = []
-pie_items = []
-pie_items_percentage = []
+def resource_path(relative_path):
+    '''Get absolute path to resource from temporary directory
+
+    In development:
+        Gets path of files that are used in this script like icons, images or file of any extension from current directory
+
+    After compiling to .exe with pyinstaller and using --add-data flag:
+        Gets path of files that are used in this script like icons, images or file of any extension from temporary directory'''
+
+    try:
+        base_path = sys._MEIPASS  # PyInstaller creates a temporary directory and stores path of that directory in _MEIPASS
+
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+explode, pie_items, pie_items_percentage = [], [], []
 
 window = tk.Tk()
 screen_width, screen_height = window.winfo_screenwidth() // 2, window.winfo_screenheight() // 2
@@ -160,7 +219,7 @@ for _ in range(8):
     window.columnconfigure(_, weight=1)
     window.rowconfigure(_, weight=1)
 
-pcc_logo = tk.PhotoImage(file="PCC_Logo.png")
+pcc_logo = tk.PhotoImage(file=resource_path('included_files\\PCC_Logo.png'))
 pcc_logo_lbl = tk.Label(window, image=pcc_logo)
 pcc_logo_lbl.grid(column=1, columnspan=3)
 
