@@ -6,4 +6,4 @@ I would like to thank Ghanteyyy (http://github.com/ghanteyyy) for contributing t
 
 **Important Note**
 
-This program will not work unless `PCC logo.png`, `instructions.txt`, `icon.ico` and `pie_chart_creator.py` are in the same folder on your device.
+This program will not work unless `pie_chart_creator.py` and the `included_files` folder are in the same folder on your device.
