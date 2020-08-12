@@ -1,80 +1,62 @@
 import os
 import sys
+import webbrowser
 
 try:  # Python 3
-    import tkinter as tk
+    import tkinter.tix as tix
     from tkinter import messagebox
 
 except (ModuleNotFoundError, ImportError):  # Python 2
-    import Tkinter as tk
+    import Tix as tix
     import tkMessageBox as messagebox
 
+import requests
 import matplotlib.pyplot as plt
 
 
-def center_window(window, title):
-    '''This function places any window (either TopLevel or Tk) to the center of the screen'''
+def is_internet():
+    '''Check if you are connected to internet'''
 
-    window.withdraw()
+    try:
+        requests.get('http://google.com')
+        return True
 
-    window.update()
-    window.focus()
-    window.grab_set()
-    window.title(title)
-    window.resizable(0, 0)
-    window.iconbitmap(resource_path('included_files\\icon.ico'))
-
-    width, height = window.winfo_width(), window.winfo_height()
-    window.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
-    window.deiconify()
+    except requests.ConnectionError:
+        return False
 
 
-def change_style(wid):
-    '''Change text styles to bold or italic'''
+def center_window(_window, title):
+    '''Set position of TopLevel or Tk window to the center of the screen'''
 
-    italic_index = ('23.0', '23.83')
-    bold_indexs = [('1.0', '1.19'), ('4.0', '4.14'), ('5.4', '5.31'), ('8.4', '8.22'), ('11.4', '11.23'), ('14.4', '14.31'), ('17.4', '17.26'), ('20.4', '20.42')]
+    _window.withdraw()
 
-    for start, end in bold_indexs:
-        wid.tag_add('b', start, end)
+    _window.update()
+    _window.title(title)
+    _window.resizable(0, 0)
+    _window.iconbitmap(resource_path('included_files\\icon.ico'))
 
-    wid.tag_configure('b', font=('Helvetica', '11', 'bold'))
+    width, height = _window.winfo_width(), _window.winfo_height()
+    _window.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
 
-    wid.tag_add('i', italic_index[0], italic_index[1])
-    wid.tag_configure('i', font=('Helvetica', '11', 'italic'))
-
-    wid.config(state=tk.DISABLED)
+    _window.deiconify()
 
 
-def instructions():
-    '''Show instruction window'''
+def open_link(event=None, _window=None):
+    '''Open the github page of the author(NMrocks) in the default browser'''
 
-    file_path = resource_path('included_files\\instructions.txt')
+    if is_internet():
+        window.after(0, lambda: webbrowser.open('http://github.com/NMrocks/Pie-Chart-Creator'))
 
-    with open(file_path, 'r') as f:
-        contents = f.read().strip('\n')
-
-    instructions_window = tk.Toplevel(window)
-
-    instructions_text_widget_frame = tk.Frame(instructions_window)
-
-    instructions_text_widget = tk.Text(instructions_text_widget_frame, height=26, cursor='arrow')
-    instructions_text_widget.insert('1.0', contents)
-    instructions_text_widget.pack(side=tk.LEFT)
-
-    instructions_text_widget_frame.pack()
-
-    instructions_window.after(0, lambda: change_style(instructions_text_widget))
-    instructions_window.after(0, lambda: center_window(instructions_window, 'PCC Instructions'))
-    instructions_window.mainloop()
+    else:
+        messagebox.showerror('ERROR', 'Unable to load page because you are not connected to internet', parent=_window)
 
 
 def append():
     '''Store data given by the user'''
 
     item = item_entry.get().title()
-    explode_ = explode_entry.get().title()
     percentage = percentage_entry.get()
+    explode_ = explode_entry.get().title()
 
     if not item:
         messagebox.showerror('Invalid Input', 'Invalid name of item')
@@ -92,7 +74,7 @@ def append():
             explode.append(0)
 
         for widget in [item_entry, percentage_entry, explode_entry]:
-            widget.delete(0, tk.END)
+            widget.delete(0, tix.END)
 
     else:
         messagebox.showerror('Invalid Percentage', 'Percentage must be in number')
@@ -107,23 +89,24 @@ def show_register():
 
     a = 0
 
-    register_window = tk.Toplevel()
+    window.withdraw()
+    register_window = tix.Toplevel()
 
     if pie_items:
-        added_lbl_1 = tk.Label(register_window, text="Name of item", justify=tk.LEFT)
+        added_lbl_1 = tix.Label(register_window, text="Name of item", justify=tix.LEFT)
         added_lbl_1.grid(row=0, column=0, pady=5)
 
-        added_lbl_2 = tk.Label(register_window, text="Percentage", justify=tk.LEFT)
+        added_lbl_2 = tix.Label(register_window, text="Percentage", justify=tix.LEFT)
         added_lbl_2.grid(row=0, column=1, pady=5)
 
-        added_lbl_3 = tk.Label(register_window, text="Emphasis", justify=tk.LEFT)
+        added_lbl_3 = tix.Label(register_window, text="Emphasis", justify=tix.LEFT)
         added_lbl_3.grid(row=0, column=2, pady=5)
 
         for pie_item in copy_pie_items:
-            appended_lbl1 = tk.Label(register_window, text=f"{pie_item.title()}")
+            appended_lbl1 = tix.Label(register_window, text=f"{pie_item.title()}")
             appended_lbl1.grid(row=a + 1, column=0)
 
-            appended_lbl2 = tk.Label(register_window, text=f"{copy_pie_items_percentage[a]}")
+            appended_lbl2 = tix.Label(register_window, text=f"{copy_pie_items_percentage[a]}")
             appended_lbl2.grid(row=a + 1, column=1)
 
             if copy_explode[a] == 0.1:
@@ -132,7 +115,7 @@ def show_register():
             else:
                 _explode_ = "Disabled"
 
-            appended_lbl3 = tk.Label(register_window, text=f"{_explode_}")
+            appended_lbl3 = tix.Label(register_window, text=f"{_explode_}")
             appended_lbl3.grid(row=a + 1, column=2)
 
             a += 1
@@ -140,13 +123,14 @@ def show_register():
         appended_lbl2.grid(pady=10)
 
     else:
-        added_lbl_1 = tk.Label(register_window, text="No items added yet. Maybe add some items?")
+        added_lbl_1 = tix.Label(register_window, text="No items added yet. Maybe add some items?")
         added_lbl_1.grid(row=0, column=1, pady=10)
 
-    clear_register_btn = tk.Button(register_window, text="Clear Register", justify='center', bd=1, cursor='hand2', relief=tk.SOLID, command=lambda: clear(register_window))
+    clear_register_btn = tix.Button(register_window, text="Clear Register", justify='center', bd=1, cursor='hand2', relief=tix.SOLID, command=lambda: _clear(register_window))
     clear_register_btn.grid(row=a + 1, column=1, pady=10)
 
     register_window.after(0, lambda: center_window(register_window, 'PCC Register'))
+    register_window.protocol('WM_DELETE_WINDOW', lambda: _exit(register_window))
     register_window.mainloop()
 
 
@@ -163,29 +147,34 @@ def make_chart():
         messagebox.showerror('No data', 'No data were inputed to make pie-charts')
 
 
-def _exit_():
-    '''Quit program'''
+def _exit(_window):
+    '''Destroy Tk window or Toplevel window'''
 
-    if messagebox.askyesno('Exit?', 'Do you really want to exit?\nAll registered values will be lost'):
-        window.destroy()
+    if _window == window:
+        if messagebox.askyesno('Exit', 'Do you really want to exit?'):
+            window.destroy()
+
+    else:
+        _window.destroy()
+        window.deiconify()
 
 
-def clear(window=None):
+def _clear(_window=None):
     '''Clear data from the register'''
 
     if pie_items:
-        if messagebox.askyesno('Clear Register?', 'Do you really want to clear REGISTER?'):
+        if messagebox.askyesno('Clear Register?', 'Do you really want to clear REGISTER?', parent=_window):
             for lists in [pie_items, pie_items_percentage, explode]:
-                del lists[0]
+                lists.clear()
 
     else:
-        messagebox.showinfo('Clear Register?', "No items added yet. Maybe add some items?")
+        messagebox.showinfo('Clear Register', "No items added yet. How about adding some items?", parent=_window)
 
-    if window:
-        window.destroy()
+    if _window:
+        _exit(_window)
 
 
-def left_button_bind(event, window):
+def left_button_bind(event=None):
     '''Focus out from the entry widget when user clicks to any widget'''
 
     if event.widget not in [item_entry, percentage_entry, explode_entry]:
@@ -212,53 +201,61 @@ def resource_path(relative_path):
 
 explode, pie_items, pie_items_percentage = [], [], []
 
-window = tk.Tk()
+window = tix.Tk()
+
 screen_width, screen_height = window.winfo_screenwidth() // 2, window.winfo_screenheight() // 2
 
 for _ in range(8):
     window.columnconfigure(_, weight=1)
     window.rowconfigure(_, weight=1)
 
-pcc_logo = tk.PhotoImage(file=resource_path('included_files\\PCC_Logo.png'))
-pcc_logo_lbl = tk.Label(window, image=pcc_logo)
+pcc_logo = tix.PhotoImage(file=resource_path('included_files\\PCC_Logo.png'))
+pcc_logo_lbl = tix.Label(window, image=pcc_logo, cursor='hand2')
 pcc_logo_lbl.grid(column=1, columnspan=3)
+pcc_logo_lbl.bind('<Button-1>', open_link)
 
-item_entry_lbl = tk.Label(window, text="Name of item:")
+item_entry_lbl = tix.Label(window, text="Name of item:")
 item_entry_lbl.grid(row=1, column=1, sticky="W")
 
-item_entry = tk.Entry(window)
+item_entry = tix.Entry(window)
 item_entry.grid(row=1, column=2, sticky="WE")
 
-percentage_entry_lbl = tk.Label(window, text="Percentage:")
+percentage_entry_lbl = tix.Label(window, text="Percentage:")
 percentage_entry_lbl.grid(row=2, column=1, sticky="W")
 
-percentage_entry = tk.Entry(window)
+percentage_entry = tix.Entry(window)
 percentage_entry.grid(row=2, column=2, sticky="WE")
 
-explode_entry_lbl = tk.Label(window, text="Enable emphasis(Y/N):")
+explode_entry_lbl = tix.Label(window, text="Enable emphasis(Y/N):")
 explode_entry_lbl.grid(row=3, column=1, sticky="W")
 
-explode_entry = tk.Entry(window)
+explode_entry = tix.Entry(window)
 explode_entry.grid(row=3, column=2, sticky="WE")
 
-append_btn = tk.Button(window, text="Add values to register", command=append)
-append_btn.grid(row=4, column=1, sticky="WE", padx=1, pady=1)
+append_btn = tix.Button(window, text="Add values to register", cursor='hand2', command=append)
+append_btn.grid(row=4, column=1, sticky="WE", columnspan=3, padx=1, pady=1)
 
-make_chart_btn = tk.Button(window, text="Make chart with registered values", command=make_chart)
-make_chart_btn.grid(row=7, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
+show_register_btn = tix.Button(window, text="View register", cursor='hand2', command=show_register)
+show_register_btn.grid(row=5, column=1, sticky="WE", columnspan=3, padx=1, pady=1)
 
-clear_btn = tk.Button(window, text="Clear Register", command=clear)
-clear_btn.grid(row=5, column=1, sticky="WE", padx=1, pady=1)
+clear_btn = tix.Button(window, text="Clear Register", cursor='hand2', command=_clear)
+clear_btn.grid(row=6, column=1, sticky="WE", columnspan=3, padx=1, pady=1)
 
-exit_btn = tk.Button(window, text="Exit Pie Chart Creator", command=_exit_)
-exit_btn.grid(row=5, column=2, sticky="WE", padx=1, pady=1)
+make_chart_btn = tix.Button(window, text="Make Pie-Chart", cursor='hand2', command=make_chart)
+make_chart_btn.grid(row=7, column=1, columnspan=3, sticky="WE", padx=1, pady=1)
 
-show_register_btn = tk.Button(window, text="View register", command=show_register)
-show_register_btn.grid(row=4, column=2, sticky="WE", padx=1, pady=1)
-
-instructions_btn = tk.Button(window, text="Read Instructions", command=instructions)
-instructions_btn.grid(row=6, column=1, columnspan=2, sticky="WE", padx=1, pady=1)
-
-window.bind('<Button-1>', lambda event, window=window: left_button_bind(event, window))
+window.bind('<Button-1>', left_button_bind)
+window.protocol('WM_DELETE_WINDOW', lambda: _exit(window))
 window.after(0, lambda: center_window(window, 'Pie Chart Creator'))
+
+balloon = tix.Balloon(window)
+balloon.bind_widget(item_entry, balloonmsg='Input desire name for your item.')
+balloon.bind_widget(clear_btn, balloonmsg='Clear ALL VALUES from the register.')
+balloon.bind_widget(pcc_logo_lbl, balloonmsg='http://github.com/NMrocks/Pie-Chart-Creator')
+balloon.bind_widget(show_register_btn, balloonmsg='View and Edit items stored in register.')
+balloon.bind_widget(percentage_entry, balloonmsg='Input percentage for the name of your item.')
+balloon.bind_widget(make_chart_btn, balloonmsg='Generate a pie-chart according to the data provided by you.')
+balloon.bind_widget(append_btn, balloonmsg='Add values you have entered in the input fields to the register.')
+balloon.bind_widget(explode_entry, balloonmsg="'Y' enables emphasis whereas 'N' disables it. If enabled some\nspaces will be created between the items in the pie-chart.")
+
 window.mainloop()
