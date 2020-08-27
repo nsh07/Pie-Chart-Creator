@@ -3,6 +3,7 @@ Different commands when user clicks different button
 '''
 
 
+import collections
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 
@@ -81,11 +82,15 @@ def make_chart(_vars):
     '''Make pie-chart as per the user's data'''
 
     items, values, explode = _vars
+    count = len(set(collections.Counter(items).values()))  # Getting count of items and calculating its length
 
-    if items:
+    if count > 1:
+        messagebox.showerror('ERROR', 'Some items have same names.')
+
+    elif items:
         figure, pie_chart = plt.subplots()
 
-        if messagebox.askyesno('Shadow', 'Do you want to show in the pie-char?'):
+        if messagebox.askyesno('Shadow', 'Do you want to show in your pie-chart?'):
             pie_chart.pie(values, explode=explode, labels=items, autopct='%1.2f%%', shadow=True, startangle=90)
 
         else:
