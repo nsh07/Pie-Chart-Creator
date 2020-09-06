@@ -78,64 +78,56 @@ class UI:
         self.tips.set_tips(self.add_value_button, 'Add values you have entered in the input fields to the register.')
         self.tips.set_tips(self.make_pie_chart_button, 'Generate a pie-chart according to the data provided by you.')
 
-        self.item_entry.bind('<FocusIn>', self.bindings)
-        self.value_entry.bind('<FocusIn>', self.bindings)
-        self.value_entry.bind('<FocusOut>', lambda event, focus_out=True: self.bindings(event, focus_out))
-
         self.master.after(0, lambda: include.initial_position(self.master, 'Pie Chart Creator'))
         self.master.protocol('WM_DELETE_WINDOW', self.exit)
-        self.master.bind('<Button-1>', self.bindings)
+        self.master.bind('<Button-1>', self.master_bindings)
+        self.item_entry.bind('<FocusIn>', self.entry_bindings)
+        self.value_entry.bind('<FocusIn>', self.entry_bindings)
+        self.explode_radio_button_enable.bind('<FocusIn>', self.entry_bindings)
+
         self.container_frame.pack()
         self.master.mainloop()
 
-    def config(self, widget=None, mode=None, text=None, color=None, styles=None):
-        '''Behaviour for the entry boxes when user gets in and out of them '''
+    def master_bindings(self, event=None):
+        '''When user clicks anywhere outside of entry boxes and buttons'''
 
-        if widget:
-            widget.delete(0, tix.END)
+        widget = event.widget
+        widgets = [self.item_entry, self.value_entry]
+        entries_widgets = {self.item_entry: 'Items', self.value_entry: 'Values'}
+        entries_styles = {self.item_entry: (self.items_style, 'I.TEntry'), self.value_entry: (self.value_style, 'V.TEntry')}
 
-            if mode == 'insert':
-                widget.insert(tix.END, text)
+        for wid in entries_widgets:
+            if not wid.get().strip():
+                wid.delete(0, tix.END)
+                wid.insert(tix.END, entries_widgets[wid])
+                style, style_name = entries_styles[wid]
+                style.configure(style_name, foreground='grey')
 
-            if widget == self.value_entry and self.item_entry.get() == 'Items':
-                self.items_style.configure('I.TEntry', foreground='grey')
-
-        styles[0].configure(styles[1], foreground=color)
-
-    def bindings(self, event, focus_out=False):
-        '''When user clicks in and out of the entries widgets'''
-
-        widgets = {self.item_entry: 'Items', self.value_entry: 'Values'}
-
-        if event.widget == self.item_entry:
-            styles = (self.items_style, 'I.TEntry')
-
-        else:
-            styles = (self.value_style, 'V.TEntry')
-
-        for widget, text in widgets.items():
-            if widget == event.widget:
-                if widget.get() == text:
-                    self.config(widget, 'delete', text, 'black', styles)
-
-            else:
-                if not widget.get():
-                    self.config(widget, 'insert', text, 'grey', styles)
-
-            if focus_out:
-                if not widget.get():
-                    self.config(widget, 'insert', text, 'grey', styles)
-
-        if event.widget not in widgets:
-            _styles = [(self.items_style, 'I.TEntry'), (self.value_style, 'V.TEntry')]
-
-            for index, widget in enumerate(widgets.items()):
-                wid, text = widget
-
-                if wid.get().strip() == text:
-                    self.config(color='grey', styles=_styles[index])
-
+        if widget not in widgets:
             self.master.focus()
+
+    def entry_bindings(self, event=None):
+        '''When user clicks in or out of the entries widget'''
+
+        widget = event.widget
+        entries_widgets = {self.item_entry: 'Items', self.value_entry: 'Values'}
+        entries_styles = {self.item_entry: (self.items_style, 'I.TEntry'), self.value_entry: (self.value_style, 'V.TEntry')}
+
+        if widget in entries_widgets:
+            if widget.get().strip() == entries_widgets[widget]:
+                widget.delete(0, tix.END)
+                style, style_name = entries_styles[widget]
+                style.configure(style_name, foreground='black')
+
+                entries_widgets.pop(widget)
+                entries_styles.pop(widget)
+
+        for wid in entries_widgets:
+            if not wid.get().strip():
+                wid.delete(0, tix.END)
+                wid.insert(tix.END, entries_widgets[wid])
+                style, style_name = entries_styles[wid]
+                style.configure(style_name, foreground='grey')
 
     def exit(self):
         '''When user clicks to X button in the title bar'''

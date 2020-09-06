@@ -37,15 +37,22 @@ class UI:
 
         self.explode_frame = tk.Frame(self.container_frame)
         self.explode_label = tk.Label(self.explode_frame, text='EXPLODE')
-        self.explode_text_widget = tk.Text(self.explode_frame, width=12, height=15, state='disabled', cursor='arrow')
+        self.explode_text_widget_frame = tk.Frame(self.explode_frame)
+        self.explode_text_widget = tk.Text(self.explode_text_widget_frame, width=12, height=15, state='disabled', cursor='arrow')
         self.explode_label.pack()
-        self.explode_text_widget.pack()
+        self.explode_text_widget.pack(side=tk.LEFT)
+        self.explode_text_widget_frame.pack()
         self.explode_frame.pack(side=tk.LEFT)
 
         self.pie_text_widgets = [self.items_text_widget, self.value_text_widget, self.explode_text_widget]
 
-        self.scrollbar = tk.Scrollbar(self.container_frame, orient="vertical", command=self.multiple_yview)
-        self.container_frame.pack(ipadx=9)
+        self.scrollbar = tk.Scrollbar(self.explode_text_widget_frame, orient="vertical", command=self.multiple_yview)
+        self.scrollbar.pack(side=tk.LEFT, fill='y')
+
+        for widgets in self.pie_text_widgets:
+            widgets.config(yscrollcommand=self.scrollbar.set)
+
+        self.container_frame.pack(padx=1)
 
         self.var = tk.IntVar()
         self.enable_editing_button = ttk.Checkbutton(self.toplevel, text='Enable Editing Mode', variable=self.var, cursor='hand2', command=self.enable_editing_command)
@@ -56,7 +63,6 @@ class UI:
         self.tips.set_tips(self.value_text_widget, 'List of the values of each items')
         self.tips.set_tips(self.explode_text_widget, 'List of enabled or disabled explode data of each items')
 
-        self.toplevel.after(0, self.show_scrollbar)
         self.toplevel.protocol('WM_DELETE_WINDOW', self.top_level_exit)
         self.toplevel.after(0, lambda: include.initial_position(self.toplevel, 'Register'))
         self.toplevel.after(0, lambda: commands.insert_to_text_widget(self.pie_text_widgets, _vars))
@@ -89,39 +95,6 @@ class UI:
                 self.var.set(1)
                 self.enable_editing_command()
                 messagebox.showinfo('Edit Mode', 'Editing Mode is Enabled')
-
-    def show_scrollbar(self):
-        '''Show self.scrollbar when the character in the text is more than the height of the text widget'''
-
-        try:
-            if self.pie_text_widgets[0].cget('height') < int(self.pie_text_widgets[0].index('end-1c').split('.')[0]):
-                self.scrollbar.pack(side=tk.LEFT, fill='y')
-
-                for widgets in self.pie_text_widgets:
-                    widgets.config(yscrollcommand=self.scrollbar.set)
-
-                self.master.after(100, self.hide_scrollbar)
-
-            else:
-                self.master.after(100, self.show_scrollbar)
-
-        except tk.TclError:
-            pass
-
-    def hide_scrollbar(self):
-        '''Hide self.scrollbar when the character in the text is less than the height of the text widget'''
-
-        try:
-            if self.pie_text_widgets[0].cget('height') >= int(self.pie_text_widgets[0].index('end-1c').split('.')[0]):
-                self.scrollbar.pack_forget()
-
-                for widgets in self.pie_text_widgets:
-                    widgets.config(yscrollcommand=None)
-
-                self.master.after(100, self.show_scrollbar)
-
-        except tk.TclError:
-            pass
 
     def enable_editing_command(self):
         '''When user clicks the enable editing checkbutton'''
