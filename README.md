@@ -1,6 +1,6 @@
 # Pie-Chart-Creator
 
-<img src="included_files/main.gif">
+<img src="pics/main.gif">
 
 A Python program which creates a pie chart using [MatPlotLib](https://github.com/matplotlib/matplotlib) and has a GUI created using [Tkinter](https://en.wikipedia.org/wiki/Tkinter)
 
