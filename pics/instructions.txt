@@ -1,0 +1,24 @@
+1. The Input Fields
+    Type the name of item, percentage of that item and Y or N to enable/disable     emphasis in the first, second and third fields respectively.
+
+2. The Buttons
+    2.1. Add values to register
+         Adds values you have entered in the input fields.
+
+    2.2. View Register
+         View and Edit item stored in register.
+
+    2.3. Clear Register
+         Clear ALL VALUES from the register.
+
+    2.4. Exit Pie Chart Creator
+         Exits PCC by erasing all items.
+
+    2.5. Read Instructions
+         Show this window.
+
+    2.6. Make chart with registered values
+         Generates pie-char according to the data provided by you.
+
+There you go! You are all set to use Pie Chart Creator! Let's make some charts, yo!
+View this program's source code at http://github.com/NMrocks/Pie-Chart-Creator
