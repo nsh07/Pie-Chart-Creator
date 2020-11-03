@@ -35,7 +35,7 @@ def initial_position(window, title):
     window.geometry(f'{width}x{height}+{screen_width - width // 2}+{screen_height - height // 2}')
 
     window.resizable(0, 0)
-    window.iconbitmap(resource_path('pics\\icon.ico'))
+    window.iconbitmap(resource_path('..\\pics\\icon.ico'))
     window.title(title)
 
     window.deiconify()
