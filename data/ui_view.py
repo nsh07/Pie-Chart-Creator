@@ -5,9 +5,9 @@ The GUI window when user clicks the view button
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox
-from data import tips
-from data import commands
-from data import include
+import tips
+import commands
+import include
 
 
 class UI:

@@ -6,11 +6,11 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.tix as tix
 from tkinter import messagebox
-from data import tips
-from data import link
-from data import ui_view
-from data import include
-from data import commands
+import tips
+import link
+import ui_view
+import include
+import commands
 
 
 class UI:
@@ -22,7 +22,7 @@ class UI:
         self.tips = tips.Tips(self.master)
 
         self.image_frame = tix.Frame(self.container_frame)
-        self.image_obj = tix.PhotoImage(file=include.resource_path('pics\\PCC_Logo.png'))
+        self.image_obj = tix.PhotoImage(file=include.resource_path('..\\pics\\PCC_Logo.png'))
         self.image_label = tix.Label(self.image_frame, image=self.image_obj, cursor='hand2')
         self.image_label.bind('<Button-1>', lambda e: link.open_link(self.master))
         self.image_label.pack()
