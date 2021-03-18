@@ -3,7 +3,6 @@ Different commands when user clicks different button
 '''
 
 
-import collections
 from tkinter import messagebox
 import matplotlib.pyplot as plt
 
@@ -21,7 +20,7 @@ def default_state(entry_widgets, styles):
     entry_widgets[2].set(0)
 
 
-def add_command(entry_widgets, _vars, styles):
+def add_command(entry_widgets, text_widgets, styles):
     '''Store item_name, values and explode in respective variables'''
 
     entry_get = entry_widgets[0].get().strip()
@@ -29,63 +28,57 @@ def add_command(entry_widgets, _vars, styles):
     split_value_get = values_get.split('.')
     explode_get = entry_widgets[2].get()
 
-    pie_items_var, values_var, explode_var = _vars
-
     if entry_get in ['', 'Items']:
         messagebox.showerror('Invalid Name', 'Provide valid item name')
 
-    elif entry_get in _vars[0]:
+    elif entry_get in text_widgets[0].get('1.0', 'end-2c').split('\n'):
         messagebox.showerror('Exists', f'{entry_get} already exists in the register')
 
-    elif not split_value_get[0].isdigit() and not split_value_get[1].isdigit():
+    elif values_get in ['', 'Values'] or not split_value_get[0].isdigit() or (len(split_value_get) == 2 and not split_value_get[1].isdigit()):
         messagebox.showerror('Invalid Values', 'Values was expected in number')
 
     elif explode_get not in [1, 2]:
         messagebox.showerror('Invalid Explode', 'You must select Enable or Disable in Explode option')
 
     else:
-        pie_items_var.append(entry_get)
-        values_var.append(float(values_get))
-
-        if explode_get == 1:
-            explode_var.append(0.1)
-
-        else:
-            explode_var.append(0)
-
-        messagebox.showinfo('Added', 'Values are added')
         default_state(entry_widgets, styles)
+        insert_to_text_widget(text_widgets, entry_get, values_get, explode_get)
 
 
-def insert_to_text_widget(text_widgets, _vars):
+def insert_to_text_widget(text_widgets, *values):
     '''Inserting data from self.explode, self.pie_items and self.pie_items_values in their own text_widget'''
+
+    pie_items = text_widgets[0].get('1.0', 'end-1c') + values[0]
+    pie_values = text_widgets[1].get('1.0', 'end-1c') + values[1]
+    pie_explode = text_widgets[2].get('1.0', 'end-1c')
+
+    if values[2] == 1:
+        pie_explode += 'Enabled'
+
+    else:
+        pie_explode += 'Disabled'
 
     for widget in text_widgets:
         widget.config(state='normal')
         widget.delete('1.0', 'end')
 
-    pie_items, pie_values, pie_explode = _vars
-    pie_explode = ['Enabled' if explode else 'Disabled' for explode in pie_explode]
-
-    for index, values in enumerate(zip(pie_items, pie_values, pie_explode)):
-        item, values, explode = values
-
-        text_widgets[0].insert('1.0', f'{item}\n')
-        text_widgets[1].insert('1.0', f'{values}\n')
-        text_widgets[2].insert('1.0', f'{explode}\n')
+    text_widgets[0].insert('1.0', f'{pie_items}\n')
+    text_widgets[1].insert('1.0', f'{pie_values}\n')
+    text_widgets[2].insert('1.0', f'{pie_explode}\n')
 
     for widget in text_widgets:
         widget.config(state='disabled', cursor='arrow')
 
 
-def make_chart(_vars):
+def make_chart(text_widgets):
     '''Make pie-chart as per the user's data'''
 
-    items, values, explode = _vars
-    count = len(set(collections.Counter(items).values()))  # Getting count of items and calculating its length
+    items = text_widgets[0].get('1.0', 'end-2c').split('\n')
+    values = [float(value) for value in text_widgets[1].get('1.0', 'end-2c').split('\n') if value]
+    explode = [0.1 if value == 'Enabled' else 0 for value in text_widgets[2].get('1.0', 'end-2c').split('\n')]
 
-    if count > 1:
-        messagebox.showerror('ERROR', 'Some items have same names.')
+    if len(items) != len(values) != len(explode):
+        messagebox.showerror('ERROR', 'There is incomplete values either in ITEMS or VALUES or EXPLODE')
 
     elif items:
         figure, pie_chart = plt.subplots()
@@ -103,16 +96,13 @@ def make_chart(_vars):
         messagebox.showerror('No data', 'No data were inputed to make pie-charts')
 
 
-def clear(_vars, text_widgets=None, styles=None):
+def clear(text_widgets):
     '''Clear data from the register'''
 
-    if _vars[0]:
-        if messagebox.askyesno('Clear Register?', 'Do you really want to clear REGISTER?'):
-            for _var in _vars:
-                _var.clear()
+    if messagebox.askyesno('Clear Register?', 'Do you really want to clear REGISTER?'):
+        for widget in text_widgets:
+            widget.config(state='normal')
+            widget.delete('1.0', 'end')
+            widget.config(state='disabled')
 
-            messagebox.showinfo('Cleared', 'All values are cleared from the REGISTER')
-            default_state(text_widgets, styles)
-
-    else:
-        messagebox.showinfo('Clear Register', "No items added yet. How about adding some items?")
+        messagebox.showinfo('Cleared', 'All values are cleared from the REGISTER')
