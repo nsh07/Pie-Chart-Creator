@@ -73,6 +73,7 @@ def insert_to_text_widget(text_widgets, *values):
 def make_chart(text_widgets):
     '''Make pie-chart as per the user's data'''
 
+    shadow = False
     items = text_widgets[0].get('1.0', 'end-2c').split('\n')
     values = [float(value) for value in text_widgets[1].get('1.0', 'end-2c').split('\n') if value]
     explode = [0.1 if value == 'Enabled' else 0 for value in text_widgets[2].get('1.0', 'end-2c').split('\n')]
@@ -83,11 +84,11 @@ def make_chart(text_widgets):
     elif items:
         figure, pie_chart = plt.subplots()
 
-        if messagebox.askyesno('Shadow', 'Do you want to show in your pie-chart?'):
-            pie_chart.pie(values, explode=explode, labels=items, autopct='%1.2f%%', shadow=True, startangle=90)
+        if messagebox.askyesno('Shadow', 'Do you want to show shadow in your pie-chart?'):
+            shadow = True
 
-        else:
-            pie_chart.pie(values, explode=explode, labels=items, autopct='%1.2f%%', shadow=False, startangle=90)
+        parameters = {'explode': explode, 'labels': items, 'autopct': '%1.2f%%', 'startangle': 90, 'shadow': shadow}
+        pie_chart.pie(values, **parameters)
 
         pie_chart.axis('equal')
         plt.show()
