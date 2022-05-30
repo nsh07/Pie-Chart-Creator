@@ -12,9 +12,15 @@ sys.path.insert(1, path)
 from Pie_Chart_Creator import PieCharCreator as PCC
 
 
+def exit(event=None):
+    thread.cancel()
+    win.destroy()
+
+
 def Test():
-    pyg.click(917, 0)
-    pyg.click(646, 367)
+    # Below commented lines were used for recording purpose
+    # pyg.click(917, 0)
+    # pyg.click(646, 367)
 
     win.update()
 
@@ -46,7 +52,6 @@ def Test():
 
     values = list(plotting_values.keys())
 
-    time.sleep(0.5)
     for value in values:
         for idx, tup in enumerate(tups):
             explode = plotting_values[value][1]
@@ -90,19 +95,22 @@ def Test():
         pyg.moveTo(_x + 10, _y + 5, duration=0.3)
         pyg.click(button='left')
 
-    time.sleep(0.5)
-    pyg.click(917, 0)
-    pyg.click(646, 367)
+    # time.sleep(0.5)
+    # pyg.click(917, 0)
+    # pyg.click(646, 367)
 
 
 plotting_values = {'Python': (88.7, 0.1), 'JavaScript': (41.6, 0), 'Java': (38.4, 0),
                   'C#': (32.3, 0.1), 'TypeScript': (28.3, 0.1), 'PHP': (25.8, 0.1),
-                  'C++': (20.5, 0), 'C': (18.2, 0.1), 'Go': (9.4, 0)}
+                  'C++': (20.5, 0), 'C': (18.2, 0.1), 'Go': (9.4, 0), 'SQL': (16.36, 0.1),
+                  'Visual Basic': (4.36, 0), 'R': (7.96, 0), 'Swift': (18.43, 0.1)}
+
 
 win = Tk()
 pcc = PCC(win)
 
-thread = threading.Thread(target=Test)
+thread = threading.Timer(5.0, Test)
 thread.start()
 
+win.protocol('WM_DELETE_WINDOW', exit)
 win.mainloop()
