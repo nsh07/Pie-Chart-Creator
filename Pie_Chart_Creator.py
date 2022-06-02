@@ -30,7 +30,9 @@ class PieCharCreator:
         self.master.withdraw()
         self.master.config(bg='white')
         self.master.title('Pie Chart Creator')
-        self.master.iconbitmap(self.ResourcePath('icon.ico'))
+
+        self.IconImage = PhotoImage(file=self.ResourcePath('icon.png'))
+        self.master.iconphoto(False, self.IconImage)
 
         self.TitleImage = PhotoImage(file=self.ResourcePath('PCC_LOGO.png'))
 
@@ -87,15 +89,15 @@ class PieCharCreator:
         self.add_button.pack(ipady=7, pady=3)
 
         # Adding TreeView widget
-        self.middle_frame = Frame(self.top_frame, bg='white')
-        self.middle_frame.pack(side=RIGHT, fill='both')
+        self.tree_frame = Frame(self.top_frame, bg='white')
+        self.tree_frame.pack(side=RIGHT, fill='both')
 
         self.Columns = ['ITEMS', 'VALUES', 'EXPLODE']
 
         self.tree_style = ttk.Style()
         self.tree_style.configure('MyStyle.Treeview')
-        self.Tree = ttk.Treeview(self.middle_frame, columns=self.Columns, show='headings', height=12, style='MyStyle.Treeview')
-        self.Tree.pack(padx=10)
+        self.Tree = ttk.Treeview(self.tree_frame, columns=self.Columns, show='headings', height=12, style='MyStyle.Treeview')
+        self.Tree.pack(side=LEFT)
 
         self.Tree.heading('ITEMS', text='ITEMS')
         self.Tree.column('ITEMS', width=250, anchor='center')
@@ -103,6 +105,11 @@ class PieCharCreator:
         self.Tree.column('VALUES', width=100, anchor='center')
         self.Tree.heading('EXPLODE', text='EXPLODE')
         self.Tree.column('EXPLODE', width=80, anchor='center')
+
+        # Attaching scrollbar to TreeView
+        self.scrollbar = Scrollbar(self.tree_frame, orient="vertical", command=self.Tree.yview)
+        self.Tree.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side=RIGHT, fill='y')
 
         # Adding plot
         self.bottom_frame = Frame(self.master, bg='white')
@@ -151,10 +158,9 @@ class PieCharCreator:
         self.master.resizable(0, 0)
 
         width = self.master.winfo_width()
-        height = self.master.winfo_height()
         screen_width = self.master.winfo_screenwidth() // 2
 
-        self.master.geometry(f'{width}x{height}+{screen_width - width // 2}+15')
+        self.master.geometry(f'+{screen_width - width // 2}+15')
         self.master.deiconify()
 
     def RestrictDefaultBindings(self, event):
@@ -165,6 +171,9 @@ class PieCharCreator:
 
         elif self.ClickedAtEmptySpace(event) and event.num == 1:
             self.Tree.selection_remove(*self.Tree.selection())
+            self.Tree.focus_set()
+            self.entry_bindings(event)
+
             return 'break'
 
     def master_bindings(self, event=None):
@@ -305,7 +314,7 @@ class PieCharCreator:
         values = list(map(lambda i: i[0], self.Details.values()))
         explodes = list(map(lambda i: 0.15 if i[1] == 1 else 0, self.Details.values()))
 
-        self.ax.pie(values, explode=explodes, labels=labels,autopct='%0.2f%%', shadow=True)
+        self.ax.pie(values, explode=explodes, labels=labels, autopct='%0.2f%%', shadow=True)
         self.plot_canvas.draw_idle()
 
     def ClickedAtEmptySpace(self, event=None):
