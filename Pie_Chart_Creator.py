@@ -34,7 +34,7 @@ class PieCharCreator:
         self.IconImage = PhotoImage(file=self.ResourcePath('icon.png'))
         self.master.iconphoto(False, self.IconImage)
 
-        self.TitleImage = PhotoImage(file=self.ResourcePath('PCC_LOGO.png'))
+        self.TitleImage = PhotoImage(file=self.ResourcePath('PCC_Logo.png'))
 
         self.top_frame = Frame(self.master)
         self.top_frame.pack()
