@@ -1,5 +1,6 @@
 import os
 import sys
+import webbrowser
 from tkinter import *
 import tkinter.ttk as ttk
 from tkinter.font import Font
@@ -42,7 +43,7 @@ class PieCharCreator:
         self.left_frame = Frame(self.top_frame, bg='white')
         self.left_frame.pack(side=LEFT, fill='y')
 
-        self.title_label = Label(self.left_frame, image=self.TitleImage, bd=0)
+        self.title_label = Label(self.left_frame, image=self.TitleImage, bd=0, cursor='hand2')
         self.title_label.pack()
 
         self.entries_frame = Frame(self.left_frame, bg='white')
@@ -140,6 +141,7 @@ class PieCharCreator:
         self.Tree.bind('<Button-3>', self.RightClick)
         self.item_entry.bind('<Return>', self.AddCommand)
         self.value_entry.bind('<Return>', self.AddCommand)
+        self.title_label.bind('<Button-1>', self.OpenGithub)
         self.master.bind('<Button-1>', self.master_bindings)
         self.item_entry.bind('<FocusIn>', self.entry_bindings)
         self.value_entry.bind('<FocusIn>', self.entry_bindings)
@@ -372,6 +374,11 @@ class PieCharCreator:
             self.Details = {'Python': (100.0, 0.1)}
 
         self.DrawPieChart()
+
+    def OpenGithub(self, event=None):
+        '''Open Github page of project when user clicks title image'''
+
+        webbrowser.open('https://github.com/NMrocks/Pie-Chart-Creator')
 
     def ResourcePath(self, FileName):
         '''Get absolute path to resource from temporary directory
